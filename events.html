@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>🎟 Event Booking & Ticket Management</title>
+
+<style>
+/* ===== GLOBAL STYLE (SAME FEEL AS LOGIN PAGE) ===== */
+body{
+  margin:0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: linear-gradient(135deg, #141e30, #243b55);
+  min-height:100vh;
+  color:#333;
+}
+
+/* ===== NAVBAR ===== */
+.navbar{
+  background:#0f172a;
+  color:white;
+  padding:15px 25px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 4px 10px rgba(0,0,0,0.4);
+}
+
+.navbar h2{
+  margin:0;
+  font-size:22px;
+}
+
+.navbar a{
+  color:white;
+  text-decoration:none;
+  margin-left:20px;
+  font-size:14px;
+}
+
+.navbar a:hover{
+  text-decoration:underline;
+}
+
+/* ===== MAIN CONTENT ===== */
+.container{
+  padding:30px;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+
+/* ===== EVENT CARD ===== */
+.card{
+  background:white;
+  width:280px;
+  padding:18px;
+  margin:15px;
+  border-radius:12px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.25);
+  transition:transform 0.3s;
+}
+
+.card:hover{
+  transform:translateY(-5px);
+}
+
+.card h3{
+  margin-top:0;
+  color:#0f172a;
+}
+
+.card p{
+  margin:6px 0;
+  font-size:14px;
+  color:#555;
+}
+
+/* ===== BUTTON ===== */
+button{
+  width:100%;
+  margin-top:10px;
+  padding:10px;
+  border:none;
+  border-radius:6px;
+  background:#0ea5e9;
+  color:white;
+  font-size:15px;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#0284c7;
+}
+
+/* ===== FOOTER MESSAGE ===== */
+.footer{
+  text-align:center;
+  color:#cbd5e1;
+  font-size:13px;
+  padding-bottom:20px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN CHECK -->
+<script>
+if(!localStorage.getItem("email")){
+  alert("Please login first");
+  window.location="login.html";
+}
+</script>
+
+<!-- NAVBAR -->
+<div class="navbar">
+  <h2>🎟 Event Booking & Ticket Management</h2>
+  <div>
+    <a href="events.html">Events</a>
+    <a href="history.html">My Bookings</a>
+    <a href="#" onclick="logout()">Logout</a>
+  </div>
+</div>
+
+<!-- EVENTS LIST -->
+<div class="container" id="events">
+  <!-- Events will load here -->
+</div>
+
+<div class="footer">
+  © 2025 Event Booking System
+</div>
+
+<script>
+const email = localStorage.getItem("email");
+
+/* LOAD EVENTS */
+fetch("http://127.0.0.1:5001/events")
+.then(res => res.json())
+.then(events => {
+  let html = "";
+  events.forEach(e => {
+    html += `
+      <div class="card">
+        <h3>${e.title}</h3>
+        <p><b>Date:</b> ${e.date}</p>
+        <p><b>Location:</b> ${e.location}</p>
+        <p><b>Price:</b> ₹${e.price}</p>
+        <button onclick="bookTicket('${e.title}')">Book Ticket</button>
+      </div>
+    `;
+  });
+  document.getElementById("events").innerHTML = html;
+})
+.catch(() => {
+  document.getElementById("events").innerHTML = "<p style='color:white'>Cannot load events</p>";
+});
+
+/* BOOK TICKET */
+function bookTicket(title){
+  fetch("http://127.0.0.1:5002/book",{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({
+      email: email,
+      eventTitle: title
+    })
+  })
+  .then(res => res.json())
+  .then(() => {
+    alert("🎉 Ticket booked successfully");
+    window.location = "history.html";
+  });
+}
+
+/* LOGOUT */
+function logout(){
+  localStorage.clear();
+  window.location = "login.html";
+}
+</script>
+
+</body>
+</html>

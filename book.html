@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Book Ticket</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+  <h2>Confirm Booking</h2>
+  <button onclick="confirm()">Confirm Ticket</button>
+</div>
+
+<script>
+function confirm(){
+ fetch("http://localhost:5002/book",{
+  method:"POST",
+  headers:{ "Content-Type":"application/json" },
+  body:JSON.stringify({
+    email: localStorage.getItem("email"),
+    eventId: localStorage.getItem("eventId")
+  })
+ })
+ .then(r=>r.json())
+ .then(d=>{
+  if(d.success){
+    alert("Ticket booked!");
+    window.location="history.html";
+  }
+ });
+}
+</script>
+
+</body>
+</html>
